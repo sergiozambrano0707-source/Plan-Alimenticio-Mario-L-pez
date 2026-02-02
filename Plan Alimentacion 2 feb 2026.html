@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan de Alimentación - Mario López</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --cream: #FBF8F3;
+            --charcoal: #2C2C2C;
+            --moss: #5B6B4D;
+            --sage: #8B9B7F;
+            --terracotta: #C67B5C;
+            --sand: #E8DCC4;
+            --accent: #D4A574;
+        }
+
+        body {
+            font-family: 'Work Sans', sans-serif;
+            background: linear-gradient(135deg, var(--cream) 0%, #F5F0E8 100%);
+            color: var(--charcoal);
+            padding: 2rem 1rem;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid var(--sand);
+            position: relative;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 2px;
+            background: var(--moss);
+        }
+
+        h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 3rem;
+            font-weight: 300;
+            color: var(--moss);
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-weight: 300;
+            color: var(--sage);
+            font-size: 1rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        }
+
+        .stat {
+            text-align: center;
+            padding: 1rem;
+            border-right: 1px solid var(--sand);
+        }
+
+        .stat:last-child {
+            border-right: none;
+        }
+
+        .stat-value {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--moss);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--sage);
+            margin-top: 0.25rem;
+        }
+
+        .macros {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .macros-flip-inner {
+            position: relative;
+            width: 100%;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+
+        .macros.flipped .macros-flip-inner {
+            transform: rotateX(180deg);
+        }
+
+        .macros-front, .macros-back {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            width: 100%;
+        }
+
+        .macros-back {
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform: rotateX(180deg);
+        }
+
+        .macros-banner {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, var(--moss) 0%, var(--sage) 100%);
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .macros-banner h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            font-weight: 400;
+            margin-bottom: 0.5rem;
+        }
+
+        .macros-banner p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            letter-spacing: 1px;
+        }
+
+        .macro-card {
+            background: white;
+            padding: 0.75rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .macro-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+
+        .macro-card.carbs { border-top: 4px solid var(--terracotta); }
+        .macro-card.protein { border-top: 4px solid var(--moss); }
+        .macro-card.fat { border-top: 4px solid var(--accent); }
+
+        .macro-amount {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--charcoal);
+            margin-top: 0.25rem;
+        }
+
+        .macro-name {
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 1.5px;
+            color: var(--sage);
+            margin-bottom: 0.25rem;
+        }
+
+        .macro-kcal {
+            font-size: 0.8rem;
+            color: var(--sage);
+            margin-top: 0.25rem;
+        }
+
+        .meals-grid {
+            display: grid;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .meal-section {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            animation: fadeIn 0.6s ease forwards;
+            opacity: 0;
+        }
+
+        .meal-section:nth-child(1) { animation-delay: 0.1s; }
+        .meal-section:nth-child(2) { animation-delay: 0.2s; }
+        .meal-section:nth-child(3) { animation-delay: 0.3s; }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            from {
+                transform: translateY(20px);
+            }
+        }
+
+        .meal-header {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--moss);
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--sand);
+        }
+
+        .food-item {
+            margin-bottom: 0.75rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .food-header {
+            padding: 1rem 1.25rem;
+            background: var(--cream);
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .food-item:hover .food-header {
+            background: var(--sand);
+            transform: translateX(4px);
+        }
+
+        .food-name {
+            font-weight: 500;
+            color: var(--charcoal);
+            flex: 1;
+        }
+
+        .expand-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--moss);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            transition: transform 0.3s ease;
+        }
+
+        .food-item.active .expand-icon {
+            transform: rotate(45deg);
+            background: var(--terracotta);
+        }
+
+        .alternatives {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.4s ease;
+            background: linear-gradient(to bottom, #FAFAF8, white);
+            border-radius: 0 0 8px 8px;
+        }
+
+        .food-item.active .alternatives {
+            max-height: 500px;
+            padding: 1.25rem;
+            border-top: 1px solid var(--sand);
+        }
+
+        .alternatives-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--sage);
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+
+        .alternative-item {
+            padding: 0.5rem 0;
+            color: var(--charcoal);
+            font-size: 0.95rem;
+            position: relative;
+            padding-left: 1rem;
+        }
+
+        .alternative-item::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--moss);
+            font-weight: 600;
+        }
+
+        .snacks-section {
+            background: linear-gradient(135deg, var(--moss) 0%, var(--sage) 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            perspective: 1000px;
+            min-height: 550px;
+            cursor: pointer;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+
+        .snacks-section.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
+
+        .flip-indicator {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.85rem;
+            opacity: 0.8;
+            letter-spacing: 1px;
+        }
+
+        .flip-indicator::after {
+            content: ' ⟲';
+            font-size: 1.2rem;
+            margin-left: 0.5rem;
+        }
+
+        .cheat-meal-content {
+            text-align: center;
+        }
+
+        .cheat-meal-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .cheat-meal-description {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            opacity: 0.95;
+        }
+
+        .cheat-meal-options {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 1.5rem;
+        }
+
+        .cheat-option {
+            padding: 0.75rem 0;
+            font-size: 1.05rem;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .cheat-option:last-child {
+            border-bottom: none;
+        }
+
+        .cheat-option::before {
+            content: '✓ ';
+            margin-right: 0.5rem;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        .cheat-meal-note {
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            font-style: italic;
+            opacity: 0.85;
+            padding: 1rem;
+            background: rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+
+        .snacks-section .meal-header {
+            color: white;
+            border-bottom-color: rgba(255,255,255,0.2);
+        }
+
+        .snacks-section .food-header {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+        }
+
+        .snacks-section .food-item:hover .food-header {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .snacks-section .food-name {
+            color: white;
+        }
+
+        .snacks-section .expand-icon {
+            background: white;
+            color: var(--moss);
+        }
+
+        .snacks-section .food-item.active .expand-icon {
+            background: var(--terracotta);
+            color: white;
+        }
+
+        .snacks-section .alternatives {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .snacks-section .alternatives-title {
+            color: rgba(255,255,255,0.8);
+        }
+
+        .snacks-section .alternative-item {
+            color: white;
+        }
+
+        .snacks-section .alternative-item::before {
+            color: var(--accent);
+        }
+
+        .notes {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        }
+
+        .notes h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            color: var(--moss);
+            margin-bottom: 1rem;
+        }
+
+        .note-item {
+            padding: 0.75rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: var(--charcoal);
+            line-height: 1.6;
+        }
+
+        .note-item::before {
+            content: '◆';
+            position: absolute;
+            left: 0;
+            color: var(--moss);
+            font-size: 0.7rem;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .macros {
+                grid-template-columns: 1fr;
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .meal-section {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Plan de Alimentación</h1>
+            <div class="subtitle">Mario López</div>
+        </header>
+
+        <div class="stats">
+            <div class="stat">
+                <span class="stat-value">23</span>
+                <span class="stat-label">Años</span>
+            </div>
+            <div class="stat">
+                <span class="stat-value">2675</span>
+                <span class="stat-label">kcal</span>
+            </div>
+        </div>
+
+        <div class="macros" onclick="toggleMacrosFlip(this)">
+            <div class="macros-flip-inner">
+                <!-- Front Side - Banner -->
+                <div class="macros-front">
+                    <div class="macros-banner">
+                        <h2>Macronutrientes Diarios</h2>
+                        <p>Click para ver el desglose completo ⟲</p>
+                    </div>
+                </div>
+
+                <!-- Back Side - Details -->
+                <div class="macros-back">
+                    <div class="macro-card carbs">
+                        <div class="macro-name">Carbohidratos</div>
+                        <div class="macro-amount">355-360 gr</div>
+                        <div class="macro-kcal">1440 kcal</div>
+                    </div>
+                    <div class="macro-card protein">
+                        <div class="macro-name">Proteínas</div>
+                        <div class="macro-amount">140-145 gr</div>
+                        <div class="macro-kcal">560 kcal</div>
+                    </div>
+                    <div class="macro-card fat">
+                        <div class="macro-name">Grasas</div>
+                        <div class="macro-amount">70-75 gr</div>
+                        <div class="macro-kcal">675 kcal</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="meals-grid">
+            <!-- Comida 1 -->
+            <div class="meal-section">
+                <div class="meal-header">Comida 1</div>
+                
+                <div class="food-item" onclick="toggleItem(this)">
+                    <div class="food-header">
+                        <span class="food-name">½ taza Avena Hojuelas (50g)</span>
+                        <span class="expand-icon">+</span>
+                    </div>
+                    <div class="alternatives">
+                        <div class="alternatives-title">Alternativas</div>
+                        <div class="alternative-item">2 rebanadas pan integral (60g)</div>
+                    </div>
+                </div>
+
+                <div class="food-item" onclick="toggleItem(this)">
+                    <div class="food-header">
+                        <span class="food-name">2 huevos enteros medianos</span>
+                        <span class="expand-icon">+</span>
+                    </div>
+                    <div class="alternatives">
+                        <div class="alternatives-title">Alternativas</div>
+                        <div class="alternative-item">2 tajadas de queso bajo en grasa</div>
+                    </div>
+                </div>
+
+                <div class="food-item" onclick="toggleItem(this)">
+                    <div class="food-header">
+                        <span class="food-name">2 porciones de Fruta</span>
+                        <span class="expand-icon">+</span>
+                    </div>
+                    <div class="alternatives">
+                        <div class="alternatives-title">Alternativas</div>
+                        <div class="alternative-item">2 bananos medianos</div>
+                        <div class="alternative-item">2 manzanas</div>
+                        <div class="alternative-item">2 naranjas</div>
+                        <div class="alternative-item">4 mandarinas</div>
+                        <div class="alternative-item">400g papaya</div>
+                        <div class="alternative-item">400g piña</div>
+                        <div class="alternative-item">400g fresas</div>
+                        <div class="alternative-item">400g arándanos</div>
+                    </div>
+                </div>
+
+                <div class="food-item" onclick="toggleItem(this)">
+                    <div class="food-header">
+                        <span class="food-name">20g de maní, almendras, nueces o semillas</span>
+                        <span class="expand-icon">+</span>
+                    </div>
+                    <div class="alternatives">
+                        <div class="alternatives-title">Alternativas</div>
+                        <div class="alternative-item">20g mantequilla de maní natural</div>
+                        <div class="alternative-item">20g almendras naturales</div>
+                        <div class="alternative-item">20g nuez de brasil</div>
+                        <div class="alternative-item">20g macadamia</div>
+                        <div class="alternative-item">20g nogal</div>
+                        <div class="alternative-item">20g marañones naturales</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comida 2 -->
+            <div class="meal-section">
+                <div class="meal-header">Comida 2</div>
+                
+                <div class="food-item" onclick="toggleItem(this)">
+                    <div class="food-header">
+                        <span class="food-name">250g de arroz cocido Integral o Blanco</span>
+                        <span class="expand-icon">+</span>
+                    </div>
+                    <div class="alternatives">
+                        <div class="alternatives-title">Alternativas</div>
+                        <div class="alternative-item">1.5 papas medianas al vapor (400g)</div>
+                        <div class="alternative-item">0.5 plátano al vapor (250g)</div>
+                    </div>
+                </div>
+
+                <div class="food-item" onclick="toggleItem(this)">
+                    <div class="food-header">
+                        <span class="food-name">150g Carne magra cocida</span>
+                        <span class="expand-icon">+</span>
+                    </div>
+                    <div class="alternatives">
+                        <div class="alternatives-title">Alternativas</div>
+                        <div class="alternative-item">Atún en agua</div>
+                        <div class="alternative-item">Lomo de res</div>
+                        <div class="alternative-item">Pechuga de pollo</div>
+                        <div class="alternative-item">Tilapia</div>
+                        <div class="alternative-item">Lomo de cerdo</div>
+                    </div>
+                </div>
+
+                <div class="food-item" onclick="toggleItem(this)">
+                    <div class="food-header">
+                        <span class="food-name">1 Aguacate Hass o ½ cáscara lisa (100g)</span>
+                        <span class="expand-icon">+</span>
+                    </div>
+                    <div class="alternatives">
+                        <div class="alternatives-title">Alternativas</div>
+                        <div class="alternative-item">½ porción de fruta + 1 cucharada aceite de oliva (15ml)</div>
+                    </div>
+                </div>
+
+                <div class="food-item" onclick="toggleItem(this)">
+                    <div class="food-header">
+                        <span class="food-name">1 Porción de fruta</span>
+                        <span class="expand-icon">+</span>
+                    </div>
+                    <div class="alternatives">
+                        <div class="alternatives-title">Alternativas</div>
+                        <div class="alternative-item">1 banano mediano</div>
+                        <div class="alternative-item">1 manzana</div>
+                        <div class="alternative-item">1 pera</div>
+                        <div class="alternative-item">1 naranja</div>
+                        <div class="alternative-item">2 mandarinas</div>
+                        <div class="alternative-item">200g papaya</div>
+                        <div class="alternative-item">200g sandía</div>
+                        <div class="alternative-item">200g fresa</div>
+                    </div>
+                </div>
+
+                <div class="food-item" onclick="toggleItem(this)">
+                    <div class="food-header">
+                        <span class="food-name">1 taza Ensalada sin aderezos</span>
+                        <span class="expand-icon">+</span>
+                    </div>
+                    <div class="alternatives">
+                        <div class="alternatives-title">Sin alternativas</div>
+                        <div class="alternative-item">Vegetales frescos variados</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comida 3 -->
+            <div class="meal-section">
+                <div class="meal-header">Comida 3</div>
+                
+                <div class="food-item" onclick="toggleItem(this)">
+                    <div class="food-header">
+                        <span class="food-name">Pasta (100g crudo o 240g cocinada)</span>
+                        <span class="expand-icon">+</span>
+                    </div>
+                    <div class="alternatives">
+                        <div class="alternatives-title">Alternativas</div>
+                        <div class="alternative-item">5 rebanadas pan integral</div>
+                        <div class="alternative-item">350g arroz cocido</div>
+                    </div>
+                </div>
+
+                <div class="food-item" onclick="toggleItem(this)">
+                    <div class="food-header">
+                        <span class="food-name">150g carne magra cocida</span>
+                        <span class="expand-icon">+</span>
+                    </div>
+                    <div class="alternatives">
+                        <div class="alternatives-title">Alternativas</div>
+                        <div class="alternative-item">Pechuga de pollo</div>
+                        <div class="alternative-item">Lomo de res</div>
+                        <div class="alternative-item">Lomo de cerdo</div>
+                    </div>
+                </div>
+
+                <div class="food-item" onclick="toggleItem(this)">
+                    <div class="food-header">
+                        <span class="food-name">1 taza Ensalada sin aderezos</span>
+                        <span class="expand-icon">+</span>
+                    </div>
+                    <div class="alternatives">
+                        <div class="alternatives-title">Sin alternativas</div>
+                        <div class="alternative-item">Vegetales frescos variados</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Snacks Section -->
+        <div class="snacks-section" onclick="toggleSnacksFlip(this)">
+            <div class="flip-card-inner">
+                <!-- Front Side -->
+                <div class="flip-card-front">
+                    <div class="meal-header">Snacks</div>
+                    
+                    <div class="food-item" onclick="event.stopPropagation(); toggleItem(this)">
+                        <div class="food-header">
+                            <span class="food-name">2 porciones de fruta</span>
+                            <span class="expand-icon">+</span>
+                        </div>
+                        <div class="alternatives">
+                            <div class="alternatives-title">Alternativas (1 porción es equivalente a:)</div>
+                            <div class="alternative-item">1 manzana</div>
+                            <div class="alternative-item">1 banano</div>
+                            <div class="alternative-item">1 naranja</div>
+                            <div class="alternative-item">2 mandarinas</div>
+                            <div class="alternative-item">200g papaya</div>
+                            <div class="alternative-item">200g piña</div>
+                            <div class="alternative-item">200g fresa</div>
+                            <div class="alternative-item">200g arándanos</div>
+                        </div>
+                    </div>
+
+                    <div class="food-item" onclick="event.stopPropagation(); toggleItem(this)">
+                        <div class="food-header">
+                            <span class="food-name">30g Mantequilla de Maní, Maní Natural o nueces</span>
+                            <span class="expand-icon">+</span>
+                        </div>
+                        <div class="alternatives">
+                            <div class="alternatives-title">Alternativas</div>
+                            <div class="alternative-item">30g almendras naturales</div>
+                            <div class="alternative-item">30g nuez de brasil</div>
+                            <div class="alternative-item">30g macadamia</div>
+                            <div class="alternative-item">30g nogal</div>
+                            <div class="alternative-item">30g marañones naturales</div>
+                        </div>
+                    </div>
+
+                    <div class="food-item" onclick="event.stopPropagation(); toggleItem(this)">
+                        <div class="food-header">
+                            <span class="food-name">2 tajadas de queso mozzarella bajo en grasa (34g)</span>
+                            <span class="expand-icon">+</span>
+                        </div>
+                        <div class="alternatives">
+                            <div class="alternatives-title">Alternativas</div>
+                            <div class="alternative-item">2 huevos medianos</div>
+                        </div>
+                    </div>
+
+                    <div class="food-item" onclick="event.stopPropagation(); toggleItem(this)">
+                        <div class="food-header">
+                            <span class="food-name">50g Avena hojuelas</span>
+                            <span class="expand-icon">+</span>
+                        </div>
+                        <div class="alternatives">
+                            <div class="alternatives-title">Alternativas</div>
+                            <div class="alternative-item">2 tajadas pan integral (60g)</div>
+                        </div>
+                    </div>
+
+                    <div class="food-item" onclick="event.stopPropagation(); toggleItem(this)">
+                        <div class="food-header">
+                            <span class="food-name">1 cucharada de aceite de oliva o coco (14ml o 15g)</span>
+                            <span class="expand-icon">+</span>
+                        </div>
+                        <div class="alternatives">
+                            <div class="alternatives-title">Uso</div>
+                            <div class="alternative-item">Para cocción de alimentos</div>
+                            <div class="alternative-item">Añadir a ensaladas</div>
+                        </div>
+                    </div>
+
+                    <div class="flip-indicator">Click para ver alternativa flexible</div>
+                </div>
+
+                <!-- Back Side -->
+                <div class="flip-card-back">
+                    <div class="cheat-meal-content">
+                        <div class="cheat-meal-title">Opción Flexible</div>
+                        <div class="cheat-meal-description">
+                            Si prefieres más flexibilidad, puedes sustituir todos los snacks por:
+                        </div>
+                        
+                        <div class="cheat-meal-options">
+                            <div class="cheat-option">1 Hamburguesa sencilla</div>
+                            <div class="cheat-option">1 Porción de papas a la francesa ó una cerveza</div>
+                        </div>
+
+                        <div class="cheat-meal-note">
+                            ⚠️ Importante: Esta opción reemplaza TODOS los snacks listados. Asegúrate de mantener el balance de tus macronutrientes en las comidas principales.
+                        </div>
+
+                        <div class="flip-indicator">Click para volver a los snacks</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notes Section -->
+        <div class="notes">
+            <h3>Notas Importantes</h3>
+            <div class="note-item">Consumo de agua: mínimo 3 litros al día</div>
+            <div class="note-item">Condimentos como sal, pimienta y vegetales para dar sabor (cebolla, ajo, etc.) puedes usarlos tranquilamente</div>
+            <div class="note-item">Si quieres más flexibilidad, usa una app de cuenta calorías y asegúrate que al final del día completas los macronutrientes: Carb 360g, Proteína 140g, Grasas 75g, Calorías 2675</div>
+        </div>
+    </div>
+
+    <script>
+        function toggleItem(element) {
+            // Close all other items
+            const allItems = document.querySelectorAll('.food-item');
+            allItems.forEach(item => {
+                if (item !== element && item.classList.contains('active')) {
+                    item.classList.remove('active');
+                }
+            });
+
+            // Toggle current item
+            element.classList.toggle('active');
+        }
+
+        function toggleSnacksFlip(element) {
+            element.classList.toggle('flipped');
+        }
+
+        function toggleMacrosFlip(element) {
+            element.classList.toggle('flipped');
+        }
+
+        // Add smooth scroll behavior
+        document.querySelectorAll('.food-item').forEach(item => {
+            item.addEventListener('click', function() {
+                setTimeout(() => {
+                    if (this.classList.contains('active')) {
+                        this.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
+                }, 100);
+            });
+        });
+    </script>
+</body>
+</html>
